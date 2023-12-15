@@ -16,7 +16,8 @@
 </style>
 <body>
     <div class="container mt-3">
-        <h1><b>Sistem Pendukung Keputusan Penentuan Karyawan Terbaik</b></h1>
+        <h1><b>Sistem Pendukung Keputusan</b></h1>
+        <h2><b>Pemilihan Karyawan Terbaik</b></h2>
 
         <div class="row mt-5">
             <div class="col">

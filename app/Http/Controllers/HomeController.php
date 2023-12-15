@@ -33,138 +33,40 @@ class HomeController extends Controller
         $arrMinMax = [];
         foreach($criterias as $c){
             // var min & max dari c[$i]
-            $max = AlternativeCriteria::where('criteria_id', $c->id)->max('score');
-            $min = (AlternativeCriteria::where('criteria_id', $c->id)->count() == 1) ? 0 : AlternativeCriteria::where('criteria_id', $c->id)->min('score');
+            $max = 5;
+            $min = AlternativeCriteria::all()->min('score');
             
             $isBenefit = ($c->type === 'benefit') ? true : false;
             // for sebanyak a
-
-foreach ($alternatives as $a) {
-
-    // proses utility dari a[$i] pada c[$i]
-
-    if ($isBenefit) {
-
-        // rumus benefit
-
-        if (AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->count() > 0) {
-
-            $score = AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->first()->score;
-            $u = ($max - $min != 0) ? ($score - $min) / ($max - $min) : 0;
-
-        } else {
-
-            $u = 0;
-        }
-
-        NilaiUtility::create([
-            'utility_score' => $u,
-            'alternative_id' => $a->id,
-            'criteria_id' => $c->id,
-        ]);
-
-    } else {
-
-        // rumus cost
-
-        if (AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->count() > 0) {
-
-            $score = AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->first()->score;
-            $u = ($max - $min != 0) ? ($max - $score) / ($max - $min) : 0;
-
-        } else {
-
-            $u = 0;
-        }
-
-        NilaiUtility::create([
-            'utility_score' => $u,
-            'alternative_id' => $a->id,
-            'criteria_id' => $c->id,
-        ]);
-    }
-}
-
-// ...
-
-// foreach($alternatives as $a){
-
-//     // proses utility dari a[$i] pada c[$i]
-
-//     if($isBenefit) {
-
-//         // rumus benefit
-
-//         if(AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->count() > 0) {
-
-//             $score = AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->first()->score;
-//             $u = ($max - $min != 0) ? ($score - $min) / ($max - $min) : 0;
-
-//         }else{
-
-//             $u = 0;
-
-//         }
-
-//         NilaiUtility::create([
-//             'utility_score' => $u,
-//             'alternative_id' => $a->id,
-//             'criteria_id' => $c->id,
-//         ]);
-
-//     } else {
-
-//         // rumus cost
-
-//         if(AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->count() > 0) {
-
-//             $score = AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->first()->score;
-//             $u = ($max - $min != 0) ? ($max - $score) / ($max - $min) : 0;
-
-//         } else {
-
-//             $u = 0;
-
-//         }
-
-//         NilaiUtility::create([
-//             'utility_score' => $u,
-//             'alternative_id' => $a->id,
-//             'criteria_id' => $c->id,
-//         ]);
-//     }
-// }
-
-// ...
-
-            // foreach($alternatives as $a){
-            //     // proses utility dari a[$i] pada c[$i]
-            //     if($isBenefit) {
-            //         // rumus benefit
-            //         if(AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->count() > 0) {
-            //             $u = (AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->first()->score - $min) / ($max - $min);
-            //         }else{
-            //             $u = 0;
-            //         }
-            //         NilaiUtility::create([
-            //             'utility_score' => $u,
-            //             'alternative_id' => $a->id,
-            //             'criteria_id' => $c->id,
-            //         ]);
-            //     }else{
-            //         // rumus cost 
-            //         if(AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->count() > 0) {
-            //             $u = ($max - AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->first()->score) / ($max - $min);
-            //         }else{
-            //             $u = 0;
-            //         }
-            //         NilaiUtility::create([
-            //             'utility_score' => $u,
-            //             'alternative_id' => $a->id,
-            //             'criteria_id' => $c->id,
-            //         ]);
-            //     }
-            // }
+            foreach($alternatives as $a){
+                // proses utility dari a[$i] pada c[$i]
+                if($isBenefit) {
+                    // rumus benefit
+                    if(AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->count() > 0) {
+                        $u = (AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->first()->score - $min) / ($max - $min);
+                    }else{
+                        $u = 0;
+                    }
+dd($max);
+                    NilaiUtility::create([
+                        'utility_score' => $u,
+                        'alternative_id' => $a->id,
+                        'criteria_id' => $c->id,
+                    ]);
+                }else{
+                    // rumus cost 
+                    if(AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->count() > 0) {
+                        $u = ($max - AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->first()->score) / ($max - $min);
+                    }else{
+                        $u = 0;
+                    }
+                    NilaiUtility::create([
+                        'utility_score' => $u,
+                        'alternative_id' => $a->id,
+                        'criteria_id' => $c->id,
+                    ]);
+                }
+            }
         }
 
         
@@ -194,50 +96,21 @@ foreach ($alternatives as $a) {
     }
 
     public function addAlternative(Request $req)
-{
-    $a = Alternative::create([
-        'name' => $req->name
-    ]);
-
-    foreach(Criteria::get() as $c){
-        // Gantilah nilai yang diinput menjadi nilai normalisasi
-        $score = $req->{'score'.$c->id};
-        $minScore = $c->min_score;
-        $maxScore = $c->max_score;
-
-        // Periksa apakah denominatormu tidak nol
-        $denominator = ($maxScore - $minScore) != 0 ? ($maxScore - $minScore) : 1;
-
-        $normalizedScore = ($score - $minScore) / $denominator;
-
-        AlternativeCriteria::create([
-            'score' => $normalizedScore,
-            'alternative_id' => $a->id,
-            'criteria_id' => $c->id
+    {
+        $a = Alternative::create([
+            'name' => $req->name
         ]);
+
+        foreach(Criteria::get() as $c){
+            AlternativeCriteria::create([
+                'score' => $req->{'score'.$c->id},
+                'alternative_id' => $a->id,
+                'criteria_id' => $c->id
+            ]);
+        }
+
+        return redirect('/');
     }
-
-    return redirect('/');
-}
-
-
-
-    // public function addAlternative(Request $req)
-    // {
-    //     $a = Alternative::create([
-    //         'name' => $req->name
-    //     ]);
-
-    //     foreach(Criteria::get() as $c){
-    //         AlternativeCriteria::create([
-    //             'score' => $req->{'score'.$c->id},
-    //             'alternative_id' => $a->id,
-    //             'criteria_id' => $c->id
-    //         ]);
-    //     }
-
-    //     return redirect('/');
-    // }
 
     public function showAddCriteria()
     {
@@ -245,23 +118,25 @@ foreach ($alternatives as $a) {
     }
 
     public function addCriteria(Request $req)
-    {
-        if(Criteria::where('name', $req->name)->count() > 0) {
-            Criteria::where('name', $req->name)->delete();
-            
-            Criteria::create([
-                'name' => $req->name,
-                'weight' => $req->weight,
-                'type' => $req->type
-            ]);
-        }else{
-            Criteria::create([
-                'name' => $req->name,
-                'weight' => $req->weight,
-                'type' => $req->type
-            ]);
-        }
+{
+    $criteriaCount = Criteria::count();
 
-        return redirect('/');
+    if ($criteriaCount >= 10) {
+        // If the criteria count is already 10 or more, show a warning message
+        return redirect('/')->with('warning', 'Cannot add more than 10 criteria.');
     }
+
+    if (Criteria::where('name', $req->name)->count() > 0) {
+        Criteria::where('name', $req->name)->delete();
+    }
+
+    Criteria::create([
+        'name' => $req->name,
+        'weight' => $req->weight,
+        'type' => $req->type
+    ]);
+
+    return redirect('/');
+}
+
 }

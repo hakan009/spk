@@ -8,5 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class NilaiUtility extends Model
 {
     use HasFactory;
+
     protected $guarded = [];
+
 }
