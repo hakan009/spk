@@ -33,8 +33,8 @@ class HomeController extends Controller
         $arrMinMax = [];
         foreach($criterias as $c){
             // var min & max dari c[$i]
-            $max = 5;
-            $min = AlternativeCriteria::all()->min('score');
+            $max = AlternativeCriteria::where('criteria_id', $c->id)->max('score');
+            $min = (AlternativeCriteria::where('criteria_id', $c->id)->count() == 1) ? 0 : AlternativeCriteria::where('criteria_id', $c->id)->min('score');
             
             $isBenefit = ($c->type === 'benefit') ? true : false;
             // for sebanyak a
@@ -47,13 +47,12 @@ class HomeController extends Controller
                     }else{
                         $u = 0;
                     }
-dd($max);
                     NilaiUtility::create([
                         'utility_score' => $u,
                         'alternative_id' => $a->id,
                         'criteria_id' => $c->id,
                     ]);
-                }else{
+                }else {
                     // rumus cost 
                     if(AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->count() > 0) {
                         $u = ($max - AlternativeCriteria::where('criteria_id', $c->id)->where('alternative_id', $a->id)->first()->score) / ($max - $min);
@@ -68,11 +67,10 @@ dd($max);
                 }
             }
         }
-
         
         // Nilai Akhir
         NilaiAkhir::where('id', '!=', null)->delete();
-        $nilaiAkhir = 0.0;
+        $nilaiAkhir = 0;
         foreach($alternatives as $a) {
             foreach($criterias as $i => $c) { 
                 $nilaiAkhir += $arrBobotKriteria[$i] * NilaiUtility::where('alternative_id', $a->id)->where('criteria_id', $c->id)->first()->utility_score;
@@ -116,20 +114,26 @@ dd($max);
     {
         return view('add-criteria');
     }
-
     public function addCriteria(Request $req)
 {
-    $criteriaCount = Criteria::count();
+    // Calculate the current total weight of existing criteria
+    $currentTotalWeight = Criteria::sum('weight');
 
-    if ($criteriaCount >= 10) {
-        // If the criteria count is already 10 or more, show a warning message
-        return redirect('/')->with('warning', 'Cannot add more than 10 criteria.');
+    // Check if adding the new weight will exceed 100
+    $proposedTotal = $currentTotalWeight + $req->weight;
+
+    if ($proposedTotal > 100) {
+        return redirect('/')
+            ->with('warning', 'Total bobot kriteria tidak bisa lebih dari 100. Total bobot saat ini: ' . $currentTotalWeight);
     }
 
-    if (Criteria::where('name', $req->name)->count() > 0) {
-        Criteria::where('name', $req->name)->delete();
+    // Check if a criterion with the same name exists and delete it
+    $existingCriteria = Criteria::where('name', $req->name)->first();
+    if ($existingCriteria) {
+        $existingCriteria->delete();
     }
 
+    // Create the new criterion if it doesn't exceed the weight limit
     Criteria::create([
         'name' => $req->name,
         'weight' => $req->weight,
@@ -138,5 +142,6 @@ dd($max);
 
     return redirect('/');
 }
+  
 
 }

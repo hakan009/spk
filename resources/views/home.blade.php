@@ -15,6 +15,13 @@
     }
 </style>
 <body>
+    <!-- Check for warning message -->
+@if(session('warning'))
+    <div class="alert alert-warning">
+        {{ session('warning') }}
+    </div>
+@endif
+
     <div class="container mt-3">
         <h1><b>Sistem Pendukung Keputusan</b></h1>
         <h2><b>Pemilihan Karyawan Terbaik</b></h2>
@@ -57,6 +64,7 @@
         <div class="row mt-5">
             <div class="col">
                 <h2 class="">Kriteria</h2>
+                <h2 class="">Bobot Kriteria Maksimal Total 100.</h2>
             </div>
             <div class="col pt-2">
                 <a href="add-criteria" class="btn btn-sm btn-primary float-end" style="border-radius: 40px;">Add Kriteria</a>
